@@ -97,6 +97,7 @@ module ActiveMerchant #:nodoc:
       
       def build_sale_or_authorization_request(action, money, options)
         currency_code = options[:currency] || currency(money)
+        options[:items] ||= []
         
         xml = Builder::XmlMarkup.new :indent => 2
         xml.tag! 'DoExpressCheckoutPaymentReq', 'xmlns' => PAYPAL_NAMESPACE do
@@ -119,6 +120,16 @@ module ActiveMerchant #:nodoc:
                 
                 xml.tag! 'n2:NotifyURL', options[:notify_url]
                 xml.tag! 'n2:ButtonSource', application_id.to_s.slice(0,32) unless application_id.blank?
+                
+                options[:items].each do |item|
+                  xml.tag! 'n2:PaymentDetailsItem' do
+                    xml.tag! 'n2:Name', item[:name]
+                    xml.tag! 'n2:Description', item[:description] if item[:description]
+                    xml.tag! 'n2:Amount', amount(item[:amount]), 'currencyID' => currency_code
+                    xml.tag! 'n2:Number', item[:number] if item[:number]
+                    xml.tag! 'n2:Quantity', item[:quantity] if item[:quantity]
+                  end                  
+                end                
               end
             end
           end
