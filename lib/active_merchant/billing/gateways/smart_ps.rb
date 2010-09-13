@@ -148,6 +148,7 @@ module ActiveMerchant #:nodoc:
       
       def add_processor(post, options)
         post[:processor] = options[:processor] unless options[:processor].nil?
+        post[:processor_id] = options[:processor_id] unless options[:processor_id].nil?
       end
       
       def add_invoice(post, options)
